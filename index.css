@@ -1,0 +1,31 @@
+#inputarea {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+
+    margin: 10px;
+}
+
+#loginarea {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+
+    margin: 10px;
+}
+
+#messagebox {
+    height: 16pt;
+    flex: 1;
+    min-width: 0px;
+}
+
+[hidden]{
+  display:none !important;
+}
