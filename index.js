@@ -42,7 +42,14 @@ function add_message(author, content, timestamp) {
 	var messageDiv = document.createElement('div');
 	messageDiv.innerHTML = post;
 
-	document.getElementById("postlist").appendChild(messageDiv);
+	var postlist = document.getElementById("postlist");
+	var atBottom = false;
+	if (Math.abs(postlist.scrollTop - postlist.scrollTopMax) <= 5) atBottom = true; // typing in the message box scrolls the post list up by 4px
+	console.log(postlist.scrollTop, postlist.scrollTopMax, atBottom);
+
+	postlist.appendChild(messageDiv);
+
+	if (atBottom) postlist.scrollTop = postlist.scrollTopMax;
 }
 window.add_message = add_message;
 

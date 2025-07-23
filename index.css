@@ -1,9 +1,17 @@
-#inputareaouter {
-    position: absolute;
+body {
+    display: flex;
+    flex-direction: column;
 
+    position: fixed;
     left: 0px;
     right: 0px;
+    top: 0px;
     bottom: 0px;
+}
+
+#inputareaouter {
+    width: 100%;
+    margin-top: auto;
 }
 
 #inputarea {
@@ -70,4 +78,8 @@
 #cancel_reply {
     position: absolute;
     right: 10px;
+}
+
+#postlist {
+    overflow: scroll;
 }
