@@ -8,7 +8,7 @@ converter.setOption("strikethrough", true);
 converter.setOption("simpleLineBreaks", true);
 
 var socket;
-if (localStorage.getItem('token').length != 96) localStorage.removeItem('token'); // token is probably wrong
+if (localStorage.getItem('token') !== null && localStorage.getItem('token').length != 96) localStorage.removeItem('token'); // token is probably wrong
 if (localStorage.getItem('token') === null) {
 	socket = io.connect("wss://api.wasteof.money/");
 } else {
