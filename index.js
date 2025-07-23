@@ -1,7 +1,11 @@
 import { io } from "https://cdn.socket.io/4.8.1/socket.io.esm.min.js";
 var converter = new showdown.Converter({
-	extensions: ["remove_p_tag", "emojis"],
+	extensions: ["remove_p_tag", "custom_image", "emojis", "br_to_p"],
 });
+
+converter.setOption("simplifiedAutoLink", true);
+converter.setOption("strikethrough", true);
+converter.setOption("simpleLineBreaks", true);
 
 var socket;
 
@@ -22,10 +26,17 @@ window.socket = socket;
 const messagebox = document.getElementById("messagebox");
 
 function add_message(author, content, timestamp) {
+	content = window.sanitizeHtml(content, {
+		allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img' ])
+	});
+
 	var post = `
-<div>
+<div class="message" id="message_${timestamp}" title="${timestamp}">
 	<span>${author}</span> : 
 	<span>${content}</span>
+	<div class="messageoptions">
+		<button class="replybutton">reply</button>
+	</div>
 </div>`;
 
 	var messageDiv = document.createElement('div');
@@ -35,10 +46,25 @@ function add_message(author, content, timestamp) {
 }
 window.add_message = add_message;
 
+var reply = null;
+
 function send_message(content) {
 	messagebox.value = "";
 
 	var rendered = converter.makeHtml(content);
+
+	if (reply !== null) {
+		rendered =
+`<ul>
+    <dd></dd>
+	<p>💬 @${reply.user} <i>${reply.content}</i></p>
+	<script>${reply.user}@${reply.timestamp}</script>
+</ul>
+${rendered}`
+	}
+
+	reply = null;
+	document.getElementById("replybox").hidden = true;
 
 	socket.emit("message", rendered);
 }
@@ -58,41 +84,100 @@ document.getElementById("sendmessage").onclick = () => {
 }
 
 messagebox.onkeydown = (e) => {
-	if (e.key == 'Enter') {
+	if (e.key == 'Enter' && !e.shiftKey) {
 		send_message(messagebox.value);
+		e.preventDefault();
 	}
+}
+
+document.getElementById("postlist").onclick = event => {
+    if (event.target.classList.contains("replybutton")) {
+		var user = event.target.parentElement.parentElement.children[0].innerText;
+		var replycontent = event.target.parentElement.parentElement.children[1].innerText;
+		var timestamp = Date.parse(event.target.parentElement.parentElement.title);
+
+		reply = {
+			user: user,
+			content: replycontent,
+			timestamp: timestamp,
+		}
+
+		var replybox = document.getElementById("replybox");
+		var reply_details = document.getElementById("reply_details");
+		reply_details.innerHTML = `Replying to @${reply.user}: <i>${window.sanitizeHtml(reply.content.slice(0, 100))}</i>`;
+		replybox.hidden = false;
+
+		var box = document.getElementById("messagebox");
+		box.focus();
+    }
 }
 
 document.getElementById("loginbutton").onclick = () => {
 	var username = document.getElementById("username");
 	var password = document.getElementById("password");
+	var token = document.getElementById("token");
 
-	fetch("https://api.wasteof.money/session", {
-		method: 'POST',
-		body: JSON.stringify({ username: username.value, password: password.value }),
-		headers: {
-			"Content-Type": "application/json"
-		}
-	}).then(response => {
-		username.value = "";
-		password.value = "";
-		if (response.status == 200) {
-			response.json().then((token) => {
-				localStorage.setItem('token', token.token);
-				console.log('token is', token.token);
+	if (token != "") {
+		localStorage.setItem('token', token.value);
+		token.value = "";
 
-				socket = io.connect("wss://api.wasteof.money/",
-					{
-						auth: {
-							token: localStorage.getItem('token')
+		socket = io.connect("wss://api.wasteof.money/",
+			{
+				auth: {
+					token: localStorage.getItem('token')
+				}
+			}
+		);
+
+		show_ui();
+
+		return;
+	}
+
+	try {
+		fetch("https://api.wasteof.money/session", {
+			method: 'POST',
+			body: JSON.stringify({ username: username.value, password: password.value }),
+			headers: {
+				"Content-Type": "application/json"
+			}
+		}).then(response => {
+			username.value = "";
+			password.value = "";
+			if (response.status == 200) {
+				response.json().then((token) => {
+					localStorage.setItem('token', token.token);
+
+					socket = io.connect("wss://api.wasteof.money/",
+						{
+							auth: {
+								token: localStorage.getItem('token')
+							}
 						}
-					}
-				);
+					);
 
-				show_ui();
-			});
-		} else {
-			document.getElementById("loginmessage").innerText = "Failed to log in.";
-		}
-	});
+					show_ui();
+				});
+			} else {
+				document.getElementById("loginmessage").innerText = "Failed to log in.";
+			}
+		});
+	} catch {
+		document.getElementById("loginmessage").innerText = "Could not reach the API. Try using a session token instead."
+	}
 }
+
+document.querySelectorAll("textarea").forEach(function(textarea) {
+  textarea.style.height = textarea.scrollHeight + "px";
+  textarea.style.overflowY = "hidden";
+
+  textarea.addEventListener("input", function() {
+    this.style.height = "auto";
+    this.style.height = this.scrollHeight + "px";
+  });
+});
+
+document.getElementById("cancel_reply").onclick = () => {
+	reply = null;
+	document.getElementById("replybox").hidden = true;
+};

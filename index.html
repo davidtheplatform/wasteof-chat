@@ -5,30 +5,37 @@
 		<link rel="stylesheet" href="index.css">
 		<link rel="stylesheet" href="emoji.css">
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+		<script src="sanitizeHtml.bundle.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/fuzzysort@3.1.0/fuzzysort.min.js"></script>
 		<script src="extension.js"></script>
 	</head>
 	<body>
 		<div id="postlist"></div>
 
-		<div id="inputarea" hidden>
-			<input type="text" id="messagebox"></input>
-			<button id="emoji_picker_button">😀</button>
-			<button id="sendmessage" style="height: inherit">Send</button>
+		<div id="inputareaouter">
+			<div id="emoji_list" hidden></div>
+			<div id="replybox" hidden><div id="reply_details"></div><button id="cancel_reply">X</button></div>
+			<div id="inputarea" hidden>
+				<div id="emoji_picker" hidden>
+					<input id="emoji_searchbar" type="text" placeholder="Find the perfect emoji...">
+					<div id="button_container"></div>
+				</div>
+				<textarea id="messagebox"></textarea>
+				<button id="emoji_picker_button">😀</button>
+				<button id="sendmessage" style="height: inherit">Send</button>
+			</div>
 		</div>
 
 		<div id="loginarea">
 			<input id="username" type="text" placeholder="Username">
 			<input id="password" type="password" placeholder="Password">
+			<span style="color: gray;">or</span>
+			<input id="token" type="password" placeholder="session token">
 			<button id="loginbutton">Log in</button>
 			<span id="loginmessage" style="color: gray; padding-left: 10px;">Your login details are only sent to wasteof.money and not to any other server.</span>
 		</div>
 
-		<div id="emoji_picker" hidden>
-            <div id="button_container">
-            </div>
-        </div>
-
-		<script src="index.js" type="module"></script>
-		<script src="emoji.js" type="module"></script>
+		<script src="/index.js" type="module"></script>
+		<script src="/emoji.js" type="module"></script>
 	</body>
 </html>

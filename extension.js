@@ -34,6 +34,18 @@
         };
     });
 
+    showdown.extension('br_to_p', function () {
+        'use strict';
+
+        return {
+            type: 'output',
+            filter: function (text, converter, options) {
+                console.log(text);
+                return text.replace("<br />", "<p></p>");
+            },
+        };
+    });
+
     showdown.extension('emojis', function () {
         'use strict';
 
@@ -43,6 +55,16 @@
             replace: function (name) {
                 return window.emoji_create_html(name);
             }
+        }
+    });
+    
+    showdown.extension('custom_image', function() {
+        'use strict';
+
+        return {
+            type: 'lang',
+            regex: /(?:::)(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*))(?:::)/g,
+            replace: '<img src="$1" />'
         }
     });
 }));

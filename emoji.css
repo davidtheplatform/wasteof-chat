@@ -6,9 +6,13 @@
     border: 5px solid darkgray;
     border-radius: 15px;
 
-    position: fixed;
+    position: absolute;
     right: 10px;
-    bottom: 50px;
+    top: -320px;
+
+    overflow: hidden;
+
+    padding: 2px;
 }
 
 #button_container {
@@ -20,6 +24,8 @@
     flex-wrap: wrap;
 
     overflow: scroll;
+
+    align-content: flex-start;
 }
 
 .emoji_button {
@@ -38,4 +44,36 @@
     line-height: 50px;
 
     cursor: pointer;
+}
+
+#emoji_list {
+    min-height: 40px;
+
+    border: 5px solid lightgray;
+    border-radius: 10px;
+}
+
+#emoji_list_element {
+    height: 40px;
+
+    line-height: 35px;
+
+    /* cursor: pointer; */
+}
+
+#emoji_list_element:hover {
+    background-color: lightgray;
+}
+
+#emoji_searchbar {
+    width: 100%;
+    height: 36px;
+    font-size: medium;
+
+    border: none;
+    background-color: whitesmoke;
+}
+
+#emoji_searchbar:focus {
+    outline: none;
 }
