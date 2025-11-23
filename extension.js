@@ -20,6 +20,8 @@
 }(function (showdown) {
     'use strict';
 
+    window.showdown = showdown;
+
     showdown.extension('remove_p_tag', function () {
         'use strict';
 
@@ -57,8 +59,8 @@
             }
         }
     });
-    
-    showdown.extension('custom_image', function() {
+
+    showdown.extension('custom_image', function () {
         'use strict';
 
         return {
@@ -67,4 +69,19 @@
             replace: '<img src="$1" />'
         }
     });
+
+
+    showdown.extension('mentions', function () {
+        'use strict';
+
+        return {
+            type: 'lang',
+            regex: /@[a-zA-Z0-9]+/g,
+            replace: function (text, converter, options) {
+                var user = text.replace('@', '').toLowerCase();
+
+                return window.create_mention(user);
+            }
+        }
+    })
 }));

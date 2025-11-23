@@ -1,0 +1,18 @@
+a[data-color] {
+    text-decoration: none;
+
+    border-radius: 5px;
+}
+
+a[data-color]:visited {
+    color: black;
+}
+
+a[data-color="red"] {
+    background-color: red;
+}
+
+a[data-color="pink"] {
+    background-color: pink;
+    border: 2px solid pink;
+}

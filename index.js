@@ -1,6 +1,6 @@
 import { io } from "https://cdn.socket.io/4.8.1/socket.io.esm.min.js";
 var converter = new showdown.Converter({
-	extensions: ["remove_p_tag", "custom_image", "emojis", "br_to_p"],
+	extensions: ["remove_p_tag", "custom_image", "emojis", "br_to_p", "mentions"],
 });
 
 converter.setOption("simplifiedAutoLink", true);
@@ -18,7 +18,7 @@ if (localStorage.getItem('token') === null) {
 				token: localStorage.getItem('token')
 			}
 		});
-	
+
 	show_ui();
 }
 window.socket = socket;
@@ -27,7 +27,11 @@ const messagebox = document.getElementById("messagebox");
 
 function add_message(author, content, timestamp) {
 	content = window.sanitizeHtml(content, {
-		allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img' ])
+		allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+		allowedAttributes: {
+			a: ['href', 'name', 'target', 'data-color'],
+			img: ['src', 'srcset', 'alt', 'title', 'width', 'height', 'loading']
+		},
 	});
 
 	var post = `
@@ -62,11 +66,10 @@ function send_message(content) {
 
 	if (reply !== null) {
 		rendered =
-`<ul>
-    <dd></dd>
-	<p>💬 @${reply.user} <i>${reply.content}</i></p>
+			`<blockquote>
+	<p>💬 ${window.create_mention(reply.user)} <i>${reply.content}</i></p>
 	<script>${reply.user}@${reply.timestamp}</script>
-</ul>
+</blockquote>
 ${rendered}`
 	}
 
@@ -81,9 +84,17 @@ function show_ui() {
 	document.getElementById("inputarea").hidden = false;
 }
 
-socket.on('message', (socket) => {
+var message_handlers = [];
+window.message_handlers = message_handlers;
+message_handlers.push((socket) => {
 	console.log('message:', socket);
 	add_message(socket.from.name, socket.content, socket.time);
+});
+
+socket.on('message', (socket) => {
+	message_handlers.forEach((handler) => {
+		handler(socket);
+	});
 });
 
 document.getElementById("sendmessage").onclick = () => {
@@ -98,7 +109,7 @@ messagebox.onkeydown = (e) => {
 }
 
 document.getElementById("postlist").onclick = event => {
-    if (event.target.classList.contains("replybutton")) {
+	if (event.target.classList.contains("replybutton")) {
 		var user = event.target.parentElement.parentElement.children[0].innerText;
 		var replycontent = event.target.parentElement.parentElement.children[1].innerText;
 		var timestamp = Date.parse(event.target.parentElement.parentElement.title);
@@ -116,7 +127,7 @@ document.getElementById("postlist").onclick = event => {
 
 		var box = document.getElementById("messagebox");
 		box.focus();
-    }
+	}
 }
 
 document.getElementById("loginbutton").onclick = () => {
@@ -174,14 +185,14 @@ document.getElementById("loginbutton").onclick = () => {
 	}
 }
 
-document.querySelectorAll("textarea").forEach(function(textarea) {
-  textarea.style.height = textarea.scrollHeight + "px";
-  textarea.style.overflowY = "hidden";
+document.querySelectorAll("textarea").forEach(function (textarea) {
+	textarea.style.height = textarea.scrollHeight + "px";
+	textarea.style.overflowY = "hidden";
 
-  textarea.addEventListener("input", function() {
-    this.style.height = "auto";
-    this.style.height = this.scrollHeight + "px";
-  });
+	textarea.addEventListener("input", function () {
+		this.style.height = "auto";
+		this.style.height = this.scrollHeight + "px";
+	});
 });
 
 document.getElementById("cancel_reply").onclick = () => {
