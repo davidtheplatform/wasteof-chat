@@ -127,10 +127,15 @@ messagebox.onkeydown = (e) => {
 }
 
 document.getElementById("postlist").onclick = event => {
-	if (event.target.classList.contains("replybutton")) {
-		var user = event.target.parentElement.parentElement.children[0].innerText;
-		var replycontent = event.target.parentElement.parentElement.children[1].innerText;
-		var timestamp = Date.parse(event.target.parentElement.parentElement.title);
+	if (event.target.classList.contains("replybutton") ||
+		(event.target.classList.contains("message") && event.ctrlKey)) {
+		var message = event.target;
+		if (event.target.classList.contains("replybutton")) {
+			message = message.parentElement.parentElement;
+		}
+		var user = message.children[0].innerText;
+		var replycontent = message.children[1].innerText;
+		var timestamp = Date.parse(message.title);
 
 		reply = {
 			user: user,
@@ -213,7 +218,7 @@ document.querySelectorAll("textarea").forEach(function (textarea) {
 	});
 });
 
-document.getElementById("cancel_reply").onclick = () => {
+document.getElementById("replybox").onclick = () => {
 	reply = null;
 	document.getElementById("replybox").hidden = true;
 };

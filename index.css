@@ -89,9 +89,8 @@ body {
     display: flex;
 }
 
-#cancel_reply {
-    position: absolute;
-    right: 10px;
+#replybox:hover {
+    background-color: var(--accent-color);
 }
 
 #postlist {
