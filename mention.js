@@ -5,7 +5,7 @@ if (localStorage.getItem("seen_users") !== null) {
 }
 window.seen_users = seen_users;
 
-window.message_handlers.push((socket) => {
+window.message_handlers.unshift((socket) => {
     seen_users[socket.from.name.toLowerCase()] = socket.from;
     localStorage.setItem("seen_users", JSON.stringify(seen_users));
 });
