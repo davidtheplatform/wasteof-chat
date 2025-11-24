@@ -1,0 +1,19 @@
+:root {
+    --background-color: #ffffff;
+    --modal-background: whitesmoke;
+    --text-color: #000000;
+    --accent-color: #a9a9a9;
+    --hover-color: #d3d3d3;
+    --highlight-color: lightyellow;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: #3b3b3b;
+        --modal-background: rgb(97, 97, 97);
+        --text-color: #e6e6e6;
+        --accent-color: #707070;
+        --hover-color: #535353;
+        --highlight-color: #685d22;
+    }
+}
