@@ -83,5 +83,24 @@
                 return window.create_mention(user);
             }
         }
-    })
+    });
+
+    showdown.extension('highlight_mention', function () {
+        'use strict';
+
+        return {
+            type: 'output',
+            filter: function (text, converter, options) {
+                console.log('highlight');
+                if (window.mentions_user(text, window.current_user)) {
+                    console.log('yes');
+                    text = '<span data-highlight="yes">' + text + "</span>";
+                }
+
+                console.log("sent", text);
+
+                return text;
+            }
+        }
+    });
 }));

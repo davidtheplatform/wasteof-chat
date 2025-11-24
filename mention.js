@@ -18,4 +18,11 @@ function create_mention(user) {
     }
 }
 
+function mentions_user(message, user) {
+    var mention_regex = RegExp(`<a href="https://wasteof.money/users/${user}" data-color="[a-z]+">@[a-zA-Z0-9]+</a>`);
+
+    return mention_regex.test(message);
+}
+
 window.create_mention = create_mention;
+window.mentions_user = mentions_user;

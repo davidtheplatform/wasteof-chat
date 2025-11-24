@@ -1,6 +1,10 @@
 import { io } from "https://cdn.socket.io/4.8.1/socket.io.esm.min.js";
 var converter = new showdown.Converter({
-	extensions: ["remove_p_tag", "custom_image", "emojis", "br_to_p", "mentions"],
+	extensions: ["remove_p_tag", "custom_image", "emojis", "br_to_p"],
+});
+
+var incoming_converter = new showdown.Converter({
+	extensions: ["remove_p_tag", "highlight_mention", "mentions"],
 });
 
 converter.setOption("simplifiedAutoLink", true);
@@ -19,6 +23,17 @@ if (localStorage.getItem('token') === null) {
 			}
 		});
 
+	fetch("https://api.wasteof.money/session", {
+		headers: {
+			Authorization: localStorage.getItem('token')
+		}
+	}).then(response => {
+		response.json().then(user => {
+			window.current_user = user.user.name;
+		});
+		// window.current_user = response.json()
+	});
+
 	show_ui();
 }
 window.socket = socket;
@@ -30,13 +45,16 @@ function add_message(author, content, timestamp) {
 		allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
 		allowedAttributes: {
 			a: ['href', 'name', 'target', 'data-color'],
+			span: ['data-highlight'],
 			img: ['src', 'srcset', 'alt', 'title', 'width', 'height', 'loading']
 		},
 	});
 
+	content = incoming_converter.makeHtml(content);
+
 	var post = `
 <div class="message" id="message_${timestamp}" title="${timestamp}">
-	<span>${author}</span> : 
+	${window.create_mention(author)} : 
 	<span>${content}</span>
 	<div class="messageoptions">
 		<button class="replybutton">reply</button>
@@ -67,7 +85,7 @@ function send_message(content) {
 	if (reply !== null) {
 		rendered =
 			`<blockquote>
-	<p>💬 ${window.create_mention(reply.user)} <i>${reply.content}</i></p>
+	<p>💬 ${reply.user} <i>${reply.content}</i></p>
 	<script>${reply.user}@${reply.timestamp}</script>
 </blockquote>
 ${rendered}`
